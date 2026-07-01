@@ -15,19 +15,22 @@ import (
 func main(){
 	
 	// Création du routeur HTTP
-	mux := http.NewServeMux()
+	//mux := http.NewServeMux()
 
 	// import my fct handler
-	healthHandler := httpin.NewHealthHandler()
+	//healthHandler := httpin.NewHealthHandler()
+
 
 	// Enregister la route dans le router 
 	// Quand le client appelle GET /health --> exécute la méthode h.Health
-	mux.HandleFunc("GET /health", healthHandler.Health)
+	//mux.HandleFunc("GET /health", healthHandler.Health)
+
+	router := httpin.NewRouter()
 
 	//creer le serveur http
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: router,
 		ReadTimeout: 5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		IdleTimeout: 30 * time.Second,
