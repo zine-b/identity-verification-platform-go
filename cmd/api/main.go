@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
+	"github.com/zineb-b/identity-verification-platform-go/internal/config"
 	
 )
 
@@ -25,11 +26,12 @@ func main(){
 	// Quand le client appelle GET /health --> exécute la méthode h.Health
 	//mux.HandleFunc("GET /health", healthHandler.Health)
 
+	cfg := config.Load()
 	router := httpin.NewRouter()
 
 	//creer le serveur http
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    cfg.HTTPAddr,
 		Handler: router,
 		ReadTimeout: 5 * time.Second,
 		WriteTimeout: 5 * time.Second,
@@ -48,7 +50,7 @@ func main(){
 
 
 	go func() {
-		log.Println("server started on :8080")
+		log.Printf("server started on %s env=%s", cfg.HTTPAddr, cfg.Env)
 
 		//lancer le serveur 
 		// crash le programme avec log.Fatal
