@@ -12,6 +12,7 @@ func NewRouter() http.Handler {
 	return Chain(
 		mux,
 		RecoveryMiddleware,
+		RequestIDMiddleware,
 		LoggingMiddleware,
 	)
 }

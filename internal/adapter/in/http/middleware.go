@@ -1,10 +1,16 @@
 package httpin
 
 import (
+	"crypto/rand"
+	"context"
 	"log"
 	"net/http"
 	"time"
+	"encoding/hex"
 )
+
+type contextKey string
+const requestIDKey contextKey = "request_id"
 
 
 // fonction qui prend handler HTTP et retourne un nouveau handler HTTP. (router mux)
@@ -32,8 +38,10 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
+		// attend juqu'a les autres Middlewares terminent
 		log.Printf(
-			"method=%s path=%s duration=%s",
+			"request_id=%s method=%s path=%s duration=%s",
+			GetRequestID(r.Context()),
 			r.Method,
 			r.URL.Path,
 			time.Since(start),
@@ -55,4 +63,38 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+//
+func RequestIDMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestID := r.Header.Get("X-Request-Id")
+		if requestID == "" {
+			requestID = generateRequestID()
+		}
+
+		w.Header().Set("X-Request-Id", requestID)
+
+		ctx := context.WithValue(r.Context(), requestIDKey, requestID)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func GetRequestID(ctx context.Context) string {
+	requestID, ok := ctx.Value(requestIDKey).(string)
+	if !ok {
+		return ""
+	}
+
+	return requestID
+}
+
+func generateRequestID() string {
+	bytes := make([]byte, 16)
+
+	if _, err := rand.Read(bytes); err != nil {
+		return time.Now().Format("20060102150405")
+	}
+
+	return hex.EncodeToString(bytes)
 }
