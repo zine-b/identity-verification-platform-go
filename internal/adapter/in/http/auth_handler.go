@@ -27,9 +27,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	var request SignupRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]string{
-			"error": "invalid request body",
-		})
+		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
@@ -38,9 +36,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		Password: request.Password,
 	})
 	if err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
-		})
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 

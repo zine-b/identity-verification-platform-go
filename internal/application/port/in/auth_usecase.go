@@ -8,9 +8,9 @@ type SignupCommand struct {
 }
 
 type SignupResult struct {
-	UserID string
-	Email  string
-	Status string
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+	Status string `json:"status"`
 }
 
 type AuthUseCase interface {
