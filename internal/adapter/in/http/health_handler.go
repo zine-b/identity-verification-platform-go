@@ -1,4 +1,4 @@
-package http
+package httpin
 
 import (
 	"net/http"
@@ -6,16 +6,36 @@ import (
 )
 type HealthHandler struct{}
 
+type HealthResponse struct{
+	Status string `json:"status"`
+}
+
 func NewHealthHandler() *HealthHandler{
 	return &HealthHandler{}
 }
 
-//http handler (fct)
+//http handler
 func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	response := HealthResponse{
+		Status: "ok",
+	}
 
-	json.NewEncoder(w).Encode(map[string]string{
-		"status": "ok",
-	})
+	writeJSON(w, http.StatusOK, response)
+}
+
+// function helper 
+func writeJSON(w http.ResponseWriter, status int, payload any) {
+	// transformer une valeur Go en JSON.
+	data, err := json.Marshal(payload)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	if _, err := w.Write(data); err != nil {
+		return
+	}
 }
