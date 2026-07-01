@@ -9,5 +9,9 @@ func NewRouter() http.Handler {
 
 	mux.HandleFunc("GET /health", healthHandler.Health)
 
-	return mux
+	return Chain(
+		mux,
+		RecoveryMiddleware,
+		LoggingMiddleware,
+	)
 }
