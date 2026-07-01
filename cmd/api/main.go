@@ -10,6 +10,7 @@ import (
 	"net/http"
 	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
 	"github.com/zineb-b/identity-verification-platform-go/internal/config"
+	postgres "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/postgres"
 	
 )
 
@@ -27,6 +28,18 @@ func main(){
 	//mux.HandleFunc("GET /health", healthHandler.Health)
 
 	cfg := config.Load()
+	dbPool, err := postgres.NewPool(context.Background(), cfg.DatabaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dbPool.Close()
+
+	if err := dbPool.Ping(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("connected to postgres")
+	
 	router := httpin.NewRouter()
 
 	//creer le serveur http
