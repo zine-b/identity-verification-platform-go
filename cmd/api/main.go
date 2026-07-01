@@ -40,7 +40,7 @@ func main(){
 
 	log.Println("connected to postgres")
 	
-	router := httpin.NewRouter()
+	router := httpin.NewRouter(dbPool)
 
 	//creer le serveur http
 	server := &http.Server{
