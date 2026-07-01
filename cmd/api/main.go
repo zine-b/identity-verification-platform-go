@@ -2,55 +2,51 @@ package main
 
 import (
 	"context"
+	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
+	"github.com/zineb-b/identity-verification-platform-go/internal/bootstrap"
+	"github.com/zineb-b/identity-verification-platform-go/internal/config"
+	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"log"
-	"net/http"
-	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
-	"github.com/zineb-b/identity-verification-platform-go/internal/config"
-	postgres "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/postgres"
-	
 )
 
-func main(){
-	
+func main() {
+
 	// Création du routeur HTTP
 	//mux := http.NewServeMux()
 
 	// import my fct handler
 	//healthHandler := httpin.NewHealthHandler()
 
-
-	// Enregister la route dans le router 
+	// Enregister la route dans le router
 	// Quand le client appelle GET /health --> exécute la méthode h.Health
 	//mux.HandleFunc("GET /health", healthHandler.Health)
 
 	cfg := config.Load()
-	dbPool, err := postgres.NewPool(context.Background(), cfg.DatabaseURL)
+	container, err := bootstrap.Build(context.Background(), cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer dbPool.Close()
+	defer container.Close()
 
-	if err := dbPool.Ping(context.Background()); err != nil {
-		log.Fatal(err)
-	}
+	log.Println("application dependencies initialized")
 
-	log.Println("connected to postgres")
-	
-	router := httpin.NewRouter(dbPool)
+	router := httpin.NewRouter(httpin.Handlers{
+		HealthHandler: container.HealthHandler,
+		AuthHandler:   container.AuthHandler,
+	})
 
 	//creer le serveur http
 	server := &http.Server{
-		Addr:    cfg.HTTPAddr,
-		Handler: router,
-		ReadTimeout: 5 * time.Second,
+		Addr:         cfg.HTTPAddr,
+		Handler:      router,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
-		IdleTimeout: 30 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
-
 
 	// Crée un context qui sera annulé quand le programme reçoit un signal d’arrêt.
 	// attendre le signal d’arrêt
@@ -61,11 +57,10 @@ func main(){
 	)
 	defer stop()
 
-
 	go func() {
 		log.Printf("server started on %s env=%s", cfg.HTTPAddr, cfg.Env)
 
-		//lancer le serveur 
+		//lancer le serveur
 		// crash le programme avec log.Fatal
 		// S’il plante pour une vraie raison, affiche l’erreur et quitte.
 		// S’il est fermé normalement, ne considère pas ça comme une erreur.
@@ -89,5 +84,5 @@ func main(){
 	}
 
 	log.Println("server stopped gracefully")
-	
+
 }

@@ -1,23 +1,27 @@
 package httpin
 
 import (
-	"crypto/rand"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"log"
 	"net/http"
 	"time"
-	"encoding/hex"
 )
 
 type contextKey string
-const requestIDKey contextKey = "request_id"
 
+const requestIDKey contextKey = "request_id"
 
 // fonction qui prend handler HTTP et retourne un nouveau handler HTTP. (router mux)
 // handler d’origine
-//        ↓
+//
+//	↓
+//
 // middleware(handler)
-//        ↓
+//
+//	↓
+//
 // handler amélioré
 type Middleware func(http.Handler) http.Handler
 
@@ -65,7 +69,6 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-//
 func RequestIDMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestID := r.Header.Get("X-Request-Id")

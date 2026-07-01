@@ -11,7 +11,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-
 type AuthService struct {
 	userRepo portout.UserRepository
 }
@@ -22,7 +21,7 @@ func NewAuthService(userRepo portout.UserRepository) *AuthService {
 	}
 }
 
-func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand)(*portin.SignupResult, error){
+func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*portin.SignupResult, error) {
 	email := strings.TrimSpace(strings.ToLower(cmd.Email))
 
 	if email == "" {

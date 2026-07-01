@@ -1,6 +1,6 @@
 package service
 
-import(
+import (
 	"errors"
 )
 

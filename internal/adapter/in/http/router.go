@@ -2,23 +2,18 @@ package httpin
 
 import (
 	"net/http"
-
-	"github.com/jackc/pgx/v5/pgxpool"
-
-	"github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/postgres"
-	"github.com/zineb-b/identity-verification-platform-go/internal/application/service"
 )
-func NewRouter(db *pgxpool.Pool) http.Handler {
+
+type Handlers struct {
+	HealthHandler *HealthHandler
+	AuthHandler   *AuthHandler
+}
+
+func NewRouter(handlers Handlers) http.Handler {
 	mux := http.NewServeMux()
 
-	
-	healthHandler := NewHealthHandler(db)
-
-	userRepository := postgres.NewUserRepository(db)
-	authService := service.NewAuthService(userRepository)
-	
-	//authUseCase := portin.N
-	authHandler := NewAuthHandler(authService)
+	healthHandler := handlers.HealthHandler
+	authHandler := handlers.AuthHandler
 
 	mux.HandleFunc("GET /health", healthHandler.Health)
 	mux.HandleFunc("POST /auth/signup", authHandler.Signup)

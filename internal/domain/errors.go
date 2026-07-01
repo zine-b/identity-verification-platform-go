@@ -6,5 +6,5 @@ import (
 
 var (
 	ErrInvalidEmail    = errors.New("invalid email")
-	ErrInvalidPassword = errors.New("invalid password")	
+	ErrInvalidPassword = errors.New("invalid password")
 )

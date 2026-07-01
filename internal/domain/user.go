@@ -21,11 +21,11 @@ type User struct {
 	UpdatedAt    time.Time
 }
 
-func NewUser(id string, email string, passwordHash string) (*User, error){
+func NewUser(id string, email string, passwordHash string) (*User, error) {
 	if email == "" {
 		return nil, ErrInvalidEmail
 	}
-	
+
 	if passwordHash == "" {
 		return nil, ErrInvalidPassword
 	}
@@ -33,13 +33,12 @@ func NewUser(id string, email string, passwordHash string) (*User, error){
 	now := time.Now()
 
 	return &User{
-		ID: id,
-		Email: email,
+		ID:           id,
+		Email:        email,
 		PasswordHash: passwordHash,
-		Status: UserStatusPending,
-		CreatedAt: now,
-		UpdatedAt: now,
-
-	},nil
+		Status:       UserStatusPending,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}, nil
 
 }
