@@ -19,7 +19,8 @@ func Load() Config {
 	}
 }
 
-// fallback default value
+// fallback are default value
+// getEnv get env values from the systemes (terminal/docker/...)
 func getEnv(key, fallback string) string {
 	value := os.Getenv(key)
 	if value == "" {

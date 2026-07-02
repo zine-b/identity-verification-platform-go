@@ -8,16 +8,17 @@ import (
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
 	userRepo portout.UserRepository
+	hasher portout.PasswordHasher
 }
 
-func NewAuthService(userRepo portout.UserRepository) *AuthService {
+func NewAuthService(userRepo portout.UserRepository, hasher portout.PasswordHasher) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
+		hasher: hasher,
 	}
 }
 
@@ -37,10 +38,7 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 	}
 
 	// hash password
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(cmd.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
+	passwordHash, err := s.hasher.Hash(cmd.Password)
 
 	user, err := domain.NewUser(
 		uuid.NewString(),

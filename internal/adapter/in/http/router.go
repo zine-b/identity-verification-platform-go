@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+//to avoid cyclic depandancy with container
 type Handlers struct {
 	HealthHandler *HealthHandler
 	AuthHandler   *AuthHandler
