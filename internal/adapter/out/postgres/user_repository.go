@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
@@ -69,6 +70,10 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain
 	)
 
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, domain.ErrUserNotFound
+		}
+	
 		return nil, err
 	}
 

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"strings"
+	"errors"
 
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
@@ -48,6 +49,10 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 	existingUser, err := s.userRepo.FindByEmail(ctx, email)
 	if err == nil && existingUser != nil {
 		return nil, domain.ErrUserAlreadyExists
+	}
+
+	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
+		return nil, err
 	}
 
 	// hash password
