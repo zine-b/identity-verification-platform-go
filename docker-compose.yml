@@ -11,6 +11,12 @@ services:
       JWT_SECRET: "dev-secret-change-me"
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
       postgres:
         condition: service_healthy
