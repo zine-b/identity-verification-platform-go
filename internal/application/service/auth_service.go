@@ -45,6 +45,11 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 		return nil, ErrPasswordTooShort
 	}
 
+	existingUser, err := s.userRepo.FindByEmail(ctx, email)
+	if err == nil && existingUser != nil {
+		return nil, domain.ErrUserAlreadyExists
+	}
+
 	// hash password
 	passwordHash, err := s.hasher.Hash(cmd.Password)
 	if err != nil {
