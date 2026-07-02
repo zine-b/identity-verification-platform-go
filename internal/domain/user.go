@@ -2,6 +2,8 @@ package domain
 
 import (
 	"time"
+	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
+
 )
 
 type UserStatus string
@@ -23,11 +25,11 @@ type User struct {
 
 func NewUser(id string, email string, passwordHash string, now time.Time) (*User, error) {
 	if email == "" {
-		return nil, ErrInvalidEmail
+		return nil, apperror.ErrInvalidEmail
 	}
 
 	if passwordHash == "" {
-		return nil, ErrInvalidPassword
+		return nil, apperror.ErrInvalidPassword
 	}
 
 	return &User{

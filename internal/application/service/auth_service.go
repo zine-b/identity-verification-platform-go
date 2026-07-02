@@ -8,6 +8,7 @@ import (
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
+	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
 )
 
 type AuthService struct {
@@ -20,13 +21,13 @@ type AuthService struct {
 	func NewAuthService(
 		userRepo portout.UserRepository, 
 		hasher portout.PasswordHasher, 
-		iDGenerator portout.IDGenerator, 
+		idGenerator portout.IDGenerator, 
 		clock portout.Clock,
 	) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
 		hasher: hasher,
-		idGenerator: iDGenerator,
+		idGenerator: idGenerator,
 		clock: clock,
 	}
 }
@@ -35,35 +36,35 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 	email := strings.TrimSpace(strings.ToLower(cmd.Email))
 
 	if email == "" {
-		return nil, ErrEmailRequired
+		return nil, apperror.ErrEmailRequired
 	}
 
 	if cmd.Password == "" {
-		return nil, ErrPasswordRequired
+		return nil, apperror.ErrPasswordRequired
 	}
 
 	if len(cmd.Password) < 8 {
-		return nil, ErrPasswordTooShort
+		return nil, apperror.ErrPasswordTooShort
 	}
 
 	existingUser, err := s.userRepo.FindByEmail(ctx, email)
 	if err == nil && existingUser != nil {
-		return nil, domain.ErrUserAlreadyExists
+		return nil, apperror.ErrUserAlreadyExists
 	}
 
-	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
+	if err != nil && !errors.Is(err, apperror.ErrUserNotFound) {
 		return nil, err
 	}
 
 	// hash password
 	passwordHash, err := s.hasher.Hash(cmd.Password)
 	if err != nil {
-		return nil, ErrFailedToHashPassword
+		return nil, apperror.ErrFailedToHashPassword
 	}
 	user, err := domain.NewUser(
 		s.idGenerator.NewID(),
 		email,
-		string(passwordHash),
+		passwordHash,
 		s.clock.Now(),
 
 	)

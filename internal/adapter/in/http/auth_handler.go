@@ -3,8 +3,11 @@ package httpin
 import (
 	"encoding/json"
 	"net/http"
+	"errors"
 
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
+	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
+
 )
 
 type AuthHandler struct {
@@ -34,8 +37,21 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		Email:    request.Email,
 		Password: request.Password,
 	})
+
 	if err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		switch {
+		case errors.Is(err, apperror.ErrUserAlreadyExists):
+			writeError(w, http.StatusConflict, err.Error())
+	
+		case errors.Is(err, apperror.ErrEmailRequired),
+			errors.Is(err, apperror.ErrPasswordRequired),
+			errors.Is(err, apperror.ErrPasswordTooShort):
+			writeError(w, http.StatusBadRequest, err.Error())
+	
+		default:
+			writeError(w, http.StatusInternalServerError, "internal server error")
+		}
+	
 		return
 	}
 
