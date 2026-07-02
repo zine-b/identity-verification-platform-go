@@ -23,6 +23,11 @@ type SignupRequest struct {
 	Password string `json:"password"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	var request SignupRequest
 
@@ -42,4 +47,24 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusCreated, result)
+}
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	var request LoginRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	result, err := h.authUseCase.Login(r.Context(), portin.LoginCommand{
+		Email:    request.Email,
+		Password: request.Password,
+	})
+	if err != nil {
+		writeAppError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, result)
 }

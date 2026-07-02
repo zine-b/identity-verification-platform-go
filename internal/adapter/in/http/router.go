@@ -18,6 +18,7 @@ func NewRouter(handlers Handlers) http.Handler {
 
 	mux.HandleFunc("GET /health", healthHandler.Health)
 	mux.HandleFunc("POST /auth/signup", authHandler.Signup)
+	mux.HandleFunc("POST /auth/login", authHandler.Login)
 
 	return Chain(
 		mux,

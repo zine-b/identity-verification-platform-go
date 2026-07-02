@@ -19,6 +19,9 @@ func writeAppError(w http.ResponseWriter, err error) {
 	case errors.Is(err, apperror.ErrUserAlreadyExists):
 		writeError(w, http.StatusConflict, err.Error())
 
+	case errors.Is(err, apperror.ErrInvalidCredentials):
+		writeError(w, http.StatusUnauthorized, err.Error())
+
 	default:
 		writeError(w, http.StatusInternalServerError, "internal server error")
 	}

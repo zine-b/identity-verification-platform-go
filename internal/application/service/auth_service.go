@@ -90,3 +90,33 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 		Status: string(user.Status),
 	}, nil
 }
+
+func (s *AuthService) Login(ctx context.Context, cmd portin.LoginCommand) (*portin.LoginResult, error){
+	email := strings.TrimSpace(strings.ToLower(cmd.Email))
+
+	if email == "" {
+		return nil, apperror.ErrEmailRequired
+	}
+
+	if cmd.Password == "" {
+		return nil, apperror.ErrPasswordRequired
+	}
+
+	user, err := s.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, apperror.ErrUserNotFound) {
+			return nil, apperror.ErrInvalidCredentials
+		}
+		return nil, err
+	}
+
+	if err := s.hasher.Compare(user.PasswordHash, cmd.Password); err != nil {
+		return nil, apperror.ErrInvalidCredentials
+	}
+
+	return &portin.LoginResult{
+		UserID: user.ID,
+		Email:  user.Email,
+		Status: string(user.Status),
+	}, nil
+}
