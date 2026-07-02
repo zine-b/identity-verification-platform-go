@@ -12,6 +12,7 @@ func writeAppError(w http.ResponseWriter, err error) {
 	case errors.Is(err, apperror.ErrEmailRequired),
 		errors.Is(err, apperror.ErrInvalidEmail),
 		errors.Is(err, apperror.ErrPasswordRequired),
+		errors.Is(err, apperror.ErrPasswordTooWeak),
 		errors.Is(err, apperror.ErrPasswordTooShort):
 		writeError(w, http.StatusBadRequest, err.Error())
 

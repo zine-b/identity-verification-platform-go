@@ -13,4 +13,5 @@ var (
 	ErrInvalidPassword = errors.New("invalid password")
 	ErrUserAlreadyExists = errors.New("user already exists")
 	ErrUserNotFound = errors.New("user not found")
+	ErrPasswordTooWeak = errors.New("password must contain uppercase, lowercase and digit")
 )

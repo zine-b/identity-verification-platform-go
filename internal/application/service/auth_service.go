@@ -37,6 +37,12 @@ type AuthService struct {
 func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*portin.SignupResult, error) {
 	email := strings.TrimSpace(strings.ToLower(cmd.Email))
 
+
+	if cmd.Email == "" {
+		return nil, apperror.ErrEmailRequired
+	}
+
+
 	if !validation.IsValidEmail(email) {
 		return nil, apperror.ErrInvalidEmail
 	}
@@ -45,8 +51,8 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 		return nil, apperror.ErrPasswordRequired
 	}
 
-	if len(cmd.Password) < 8 {
-		return nil, apperror.ErrPasswordTooShort
+	if !validation.IsStrongPassword(cmd.Password) {
+		return nil, apperror.ErrPasswordTooWeak
 	}
 
 	existingUser, err := s.userRepo.FindByEmail(ctx, email)
