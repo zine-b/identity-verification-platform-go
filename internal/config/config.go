@@ -8,6 +8,12 @@ type Config struct {
 	HTTPAddr    string
 	Env         string
 	DatabaseURL string
+	// pour signer le token JWT.
+	/*
+	La signature permet au serveur de vérifier plus tard :
+	Est-ce que ce token a bien été créé par mon backend ?
+	Est-ce que quelqu’un l’a modifié ?
+	*/
 	JWTSecret 	string
 }
 

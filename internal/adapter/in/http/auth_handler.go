@@ -68,3 +68,13 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, result)
 }
+
+func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
+	claims, ok := GetUserClaims(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, claims)
+}

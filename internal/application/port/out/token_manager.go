@@ -10,4 +10,5 @@ type TokenClaims struct {
 
 type TokenManager interface {
 	GenerateAccessToken(claims TokenClaims, ttl time.Duration) (string, error)
+	ValidateAccessToken(token string) (*TokenClaims, error)
 }

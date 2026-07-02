@@ -11,6 +11,8 @@ import (
 	"github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/security"
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/service"
 	"github.com/zineb-b/identity-verification-platform-go/internal/config"
+	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
+
 )
 
 // Ce container, cree la cnx avec la base de données, ensuite cree les depandances, à la fin return un object
@@ -19,6 +21,7 @@ import (
 type Container struct {
 	HealthHandler *httpin.HealthHandler
 	AuthHandler   *httpin.AuthHandler
+	TokenManager portout.TokenManager
 
 	Close func()
 }
@@ -45,6 +48,7 @@ func Build(ctx context.Context, cfg config.Config) (*Container, error) {
 	return &Container{
 		HealthHandler: httpin.NewHealthHandler(dbPool),
 		AuthHandler:   httpin.NewAuthHandler(authService),
+		TokenManager:  tokenManager,
 		Close: func() {
 			dbPool.Close()
 		},

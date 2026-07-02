@@ -7,11 +7,17 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"strings"
+	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 )
 
 type contextKey string
 
 const requestIDKey contextKey = "request_id"
+
+type userClaimsContextKey string
+
+const userClaimsKey userClaimsContextKey = "user_claims"
 
 // fonction qui prend handler HTTP et retourne un nouveau handler HTTP. (router mux)
 // handler d’origine
@@ -100,4 +106,38 @@ func generateRequestID() string {
 	}
 
 	return hex.EncodeToString(bytes)
+}
+
+
+
+func AuthMiddleware(tokenManager portout.TokenManager) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authHeader := r.Header.Get("Authorization")
+			if authHeader == "" {
+				writeError(w, http.StatusUnauthorized, "missing authorization header")
+				return
+			}
+
+			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+			if tokenString == authHeader {
+				writeError(w, http.StatusUnauthorized, "invalid authorization header")
+				return
+			}
+
+			claims, err := tokenManager.ValidateAccessToken(tokenString)
+			if err != nil {
+				writeError(w, http.StatusUnauthorized, "invalid token")
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), userClaimsKey, claims)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func GetUserClaims(ctx context.Context) (*portout.TokenClaims, bool) {
+	claims, ok := ctx.Value(userClaimsKey).(*portout.TokenClaims)
+	return claims, ok
 }
