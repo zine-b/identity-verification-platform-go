@@ -9,6 +9,8 @@ import (
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
+	"github.com/zineb-b/identity-verification-platform-go/internal/application/validation"
+
 )
 
 type AuthService struct {
@@ -35,8 +37,8 @@ type AuthService struct {
 func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*portin.SignupResult, error) {
 	email := strings.TrimSpace(strings.ToLower(cmd.Email))
 
-	if email == "" {
-		return nil, apperror.ErrEmailRequired
+	if !validation.IsValidEmail(email) {
+		return nil, apperror.ErrInvalidEmail
 	}
 
 	if cmd.Password == "" {

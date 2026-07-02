@@ -25,11 +25,11 @@ type User struct {
 
 func NewUser(id string, email string, passwordHash string, now time.Time) (*User, error) {
 	if email == "" {
-		return nil, apperror.ErrInvalidEmail
+		return nil, apperror.ErrEmailRequired
 	}
 
 	if passwordHash == "" {
-		return nil, apperror.ErrInvalidPassword
+		return nil, apperror.ErrPasswordRequired
 	}
 
 	return &User{
