@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/google/uuid"
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
@@ -13,12 +12,14 @@ import (
 type AuthService struct {
 	userRepo portout.UserRepository
 	hasher portout.PasswordHasher
+	idGenerator portout.IDGenerator
 }
 
-func NewAuthService(userRepo portout.UserRepository, hasher portout.PasswordHasher) *AuthService {
+func NewAuthService(userRepo portout.UserRepository, hasher portout.PasswordHasher, iDGenerator portout.IDGenerator) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
 		hasher: hasher,
+		idGenerator: iDGenerator,
 	}
 }
 
@@ -41,7 +42,7 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 	passwordHash, err := s.hasher.Hash(cmd.Password)
 
 	user, err := domain.NewUser(
-		uuid.NewString(),
+		s.idGenerator.NewID(),
 		email,
 		string(passwordHash),
 	)

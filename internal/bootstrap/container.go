@@ -8,6 +8,8 @@ import (
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/service"
 	"github.com/zineb-b/identity-verification-platform-go/internal/config"
 	"github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/security"
+	"github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/id"
+
 )
 
 // Ce container, cree la cnx avec la base de données, ensuite cree les depandances, à la fin return un object 
@@ -33,7 +35,8 @@ func Build(ctx context.Context, cfg config.Config) (*Container, error) {
 
 	userRepository := postgres.NewUserRepository(dbPool)
 	hasher := security.NewBcryptHasher()
-	authService := service.NewAuthService(userRepository, hasher)
+	idGenerator := id.NewUUIDGenerator()
+	authService := service.NewAuthService(userRepository, hasher, idGenerator)
 
 	return &Container{
 		HealthHandler: httpin.NewHealthHandler(dbPool),
