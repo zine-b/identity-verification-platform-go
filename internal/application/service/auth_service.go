@@ -13,13 +13,20 @@ type AuthService struct {
 	userRepo portout.UserRepository
 	hasher portout.PasswordHasher
 	idGenerator portout.IDGenerator
+	clock portout.Clock
 }
 
-func NewAuthService(userRepo portout.UserRepository, hasher portout.PasswordHasher, iDGenerator portout.IDGenerator) *AuthService {
+	func NewAuthService(
+		userRepo portout.UserRepository, 
+		hasher portout.PasswordHasher, 
+		iDGenerator portout.IDGenerator, 
+		clock portout.Clock,
+	) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
 		hasher: hasher,
 		idGenerator: iDGenerator,
+		clock: clock,
 	}
 }
 
@@ -40,11 +47,15 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 
 	// hash password
 	passwordHash, err := s.hasher.Hash(cmd.Password)
-
+	if err != nil {
+		return nil, ErrFailedToHashPassword
+	}
 	user, err := domain.NewUser(
 		s.idGenerator.NewID(),
 		email,
 		string(passwordHash),
+		s.clock.Now(),
+
 	)
 	if err != nil {
 		return nil, err
