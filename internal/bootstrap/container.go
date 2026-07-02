@@ -38,7 +38,9 @@ func Build(ctx context.Context, cfg config.Config) (*Container, error) {
 	hasher := security.NewBcryptHasher()
 	idGenerator := id.NewUUIDGenerator()
 	systemClock := clock.NewSystemClock()
-	authService := service.NewAuthService(userRepository, hasher, idGenerator, systemClock)
+	tokenManager := security.NewJWTManager(cfg.JWTSecret)
+
+	authService := service.NewAuthService(userRepository, hasher, idGenerator, systemClock, tokenManager)
 
 	return &Container{
 		HealthHandler: httpin.NewHealthHandler(dbPool),

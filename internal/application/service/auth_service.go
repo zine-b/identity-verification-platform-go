@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"errors"
+	"time"
 
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
@@ -18,6 +19,7 @@ type AuthService struct {
 	hasher portout.PasswordHasher
 	idGenerator portout.IDGenerator
 	clock portout.Clock
+	tokenManager portout.TokenManager
 }
 
 	func NewAuthService(
@@ -25,12 +27,14 @@ type AuthService struct {
 		hasher portout.PasswordHasher, 
 		idGenerator portout.IDGenerator, 
 		clock portout.Clock,
+		tokenManager portout.TokenManager,
 	) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
 		hasher: hasher,
 		idGenerator: idGenerator,
 		clock: clock,
+		tokenManager: tokenManager,
 	}
 }
 
@@ -114,9 +118,19 @@ func (s *AuthService) Login(ctx context.Context, cmd portin.LoginCommand) (*port
 		return nil, apperror.ErrInvalidCredentials
 	}
 
+	accessToken, err := s.tokenManager.GenerateAccessToken(portout.TokenClaims{
+		UserID: user.ID,
+		Email:  user.Email,
+		Status: string(user.Status),
+	}, 15*time.Minute)
+	if err != nil {
+		return nil, err
+	}
+
 	return &portin.LoginResult{
 		UserID: user.ID,
 		Email:  user.Email,
 		Status: string(user.Status),
+		AccessToken: accessToken,
 	}, nil
 }

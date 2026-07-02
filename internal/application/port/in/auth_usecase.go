@@ -19,9 +19,10 @@ type LoginCommand struct{
 }
 
 type LoginResult struct{
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
-	Status string `json:"status"`
+	UserID		string `json:"user_id"`
+	Email  		string `json:"email"`
+	Status 		string `json:"status"`
+	AccessToken string `json:"access_token"`
 }
 
 type AuthUseCase interface {

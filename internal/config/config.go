@@ -8,6 +8,7 @@ type Config struct {
 	HTTPAddr    string
 	Env         string
 	DatabaseURL string
+	JWTSecret 	string
 }
 
 // new config
@@ -16,6 +17,7 @@ func Load() Config {
 		HTTPAddr:    getEnv("HTTP_ADDR", ":8080"),
 		Env:         getEnv("APP_ENV", "local"),
 		DatabaseURL: getEnv("DATABASE_URL", ""),
+		JWTSecret: 	 getEnv("JWT_SECRET", "dev-secret-change-me"),
 	}
 }
 
