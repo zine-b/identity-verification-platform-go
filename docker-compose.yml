@@ -9,6 +9,7 @@ services:
       APP_ENV: "local"
       DATABASE_URL: "postgres://identity_user:identity_password@postgres:5432/identity_db?sslmode=disable"
       JWT_SECRET: "dev-secret-change-me"
+      REDIS_ADDR: "redis:6379"
     ports:
       - "8080:8080"
     healthcheck:
@@ -33,7 +34,7 @@ services:
       POSTGRES_DB: identity_db
       POSTGRES_USER: identity_user
       POSTGRES_PASSWORD: identity_password
-      REDIS_ADDR: "redis:6379"
+      
     ports:
       - "5432:5432"
     volumes:
@@ -49,7 +50,6 @@ services:
     container_name: identity_migrate
     volumes:
       - ./migrations:/migrations
-    # equi d :  migrate -path migrations -database "$DATABASE_URL" up
     command:
       [
         "-path", "/migrations",

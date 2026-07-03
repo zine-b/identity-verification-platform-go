@@ -15,6 +15,7 @@ type Config struct {
 	Est-ce que quelqu’un l’a modifié ?
 	*/
 	JWTSecret 	string
+	RedisAddr string
 }
 
 // new config
@@ -24,6 +25,7 @@ func Load() Config {
 		Env:         getEnv("APP_ENV", "local"),
 		DatabaseURL: getEnv("DATABASE_URL", ""),
 		JWTSecret: 	 getEnv("JWT_SECRET", "dev-secret-change-me"),
+		RedisAddr: 	 getEnv("REDIS_ADDR", "localhost:6379"),
 	}
 }
 

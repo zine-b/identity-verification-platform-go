@@ -3,20 +3,27 @@ package httpin
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http"
+	"github.com/redis/go-redis/v9"
+
 )
 
 type HealthHandler struct {
 	db *pgxpool.Pool
+	redis *redis.Client
 }
 
 type HealthResponse struct {
 	Status   string `json:"status"`
 	Postgres string `json:"postgres"`
+	Redis 	 string `json:"redis"`
+
+	
 }
 
-func NewHealthHandler(db *pgxpool.Pool) *HealthHandler {
+func NewHealthHandler(db *pgxpool.Pool, redis *redis.Client) *HealthHandler {
 	return &HealthHandler{
 		db: db,
+		redis: redis,
 	}
 }
 
@@ -28,9 +35,15 @@ func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
 		postgresStatus = "down"
 	}
 
+	redisStatus := "ok"
+	if err := h.redis.Ping(r.Context()).Err(); err != nil {
+		redisStatus = "down"
+	}
+
 	response := HealthResponse{
 		Status:   "ok",
 		Postgres: postgresStatus,
+		Redis: redisStatus,
 	}
 
 	writeJSON(w, http.StatusOK, response)
