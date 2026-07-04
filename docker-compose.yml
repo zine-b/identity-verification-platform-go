@@ -26,6 +26,9 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - identity_network
+
 
     
   postgres:
@@ -45,6 +48,9 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - identity_network
+
 
   migrate:
     image: migrate/migrate:4
@@ -61,6 +67,9 @@ services:
       postgres:
         condition: service_healthy
     restart: "no"
+    networks:
+      - identity_network
+
     
 
   redis:
@@ -76,7 +85,13 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - identity_network
+
 
 volumes:
   postgres_data:
   redis_data:
+networks:
+  identity_network:
+    driver: bridge
