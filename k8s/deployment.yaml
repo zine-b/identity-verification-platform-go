@@ -27,6 +27,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: identity-api-config
+            - secretRef:
+                name: identity-api-secret
 
           resources:
             requests:
