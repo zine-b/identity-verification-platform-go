@@ -10,8 +10,8 @@ import (
 type JWTManager struct {
 	// slice de bytes
 	// la clé de signature du token qui existe dans la conf est en string
-	// mais jwt attend un byte 
-	// donc object secret c pour convertir string --> byte 
+	// mais jwt attend un byte
+	// donc object secret c pour convertir string --> byte
 	secret []byte
 }
 
@@ -24,7 +24,7 @@ func NewJWTManager(secret string) *JWTManager {
 func (m *JWTManager) GenerateAccessToken(claims portout.TokenClaims, ttl time.Duration) (string, error) {
 	now := time.Now()
 
-	// generer le token 
+	// generer le token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":    claims.UserID,
 		"email":  claims.Email,
@@ -33,7 +33,7 @@ func (m *JWTManager) GenerateAccessToken(claims portout.TokenClaims, ttl time.Du
 		"exp":    now.Add(ttl).Unix(),
 	})
 
-	// signer le token 
+	// signer le token
 	return token.SignedString(m.secret)
 }
 

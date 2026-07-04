@@ -1,9 +1,8 @@
 package domain
 
 import (
-	"time"
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
-
+	"time"
 )
 
 type UserStatus string

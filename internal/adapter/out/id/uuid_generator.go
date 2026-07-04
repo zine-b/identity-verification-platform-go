@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type UUIDGenerator struct{}
 
-func NewUUIDGenerator() *UUIDGenerator{
+func NewUUIDGenerator() *UUIDGenerator {
 	return &UUIDGenerator{}
 }
 

@@ -5,9 +5,8 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
-
+	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
 )
 
 type UserRepository struct {
@@ -75,7 +74,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain
 		if err == pgx.ErrNoRows {
 			return nil, apperror.ErrUserNotFound
 		}
-	
+
 		return nil, err
 	}
 

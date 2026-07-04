@@ -1,15 +1,15 @@
 package httpin
 
 import (
-	"net/http"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
+	"net/http"
 )
 
-//to avoid cyclic depandancy with container
+// to avoid cyclic depandancy with container
 type Handlers struct {
 	HealthHandler *HealthHandler
 	AuthHandler   *AuthHandler
-	TokenManager   portout.TokenManager
+	TokenManager  portout.TokenManager
 }
 
 func NewRouter(handlers Handlers) http.Handler {
@@ -21,7 +21,7 @@ func NewRouter(handlers Handlers) http.Handler {
 	meHandler := AuthMiddleware(handlers.TokenManager)(
 		http.HandlerFunc(handlers.AuthHandler.Me),
 	)
-	
+
 	mux.Handle("GET /me", meHandler)
 	mux.HandleFunc("GET /health", healthHandler.Health)
 	mux.HandleFunc("POST /auth/signup", authHandler.Signup)

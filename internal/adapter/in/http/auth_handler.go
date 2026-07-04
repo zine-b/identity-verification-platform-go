@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
-
 )
 
 type AuthHandler struct {

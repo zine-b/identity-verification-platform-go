@@ -13,15 +13,15 @@ type SignupResult struct {
 	Status string `json:"status"`
 }
 
-type LoginCommand struct{
-	Email 	 string
+type LoginCommand struct {
+	Email    string
 	Password string
 }
 
-type LoginResult struct{
-	UserID		string `json:"user_id"`
-	Email  		string `json:"email"`
-	Status 		string `json:"status"`
+type LoginResult struct {
+	UserID      string `json:"user_id"`
+	Email       string `json:"email"`
+	Status      string `json:"status"`
 	AccessToken string `json:"access_token"`
 }
 

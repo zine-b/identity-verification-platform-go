@@ -37,7 +37,7 @@ func main() {
 	router := httpin.NewRouter(httpin.Handlers{
 		HealthHandler: container.HealthHandler,
 		AuthHandler:   container.AuthHandler,
-		TokenManager:   container.TokenManager,
+		TokenManager:  container.TokenManager,
 	})
 
 	//creer le serveur http

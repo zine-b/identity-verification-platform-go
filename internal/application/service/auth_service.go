@@ -2,38 +2,37 @@ package service
 
 import (
 	"context"
-	"strings"
 	"errors"
+	"strings"
 	"time"
 
+	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
 	portin "github.com/zineb-b/identity-verification-platform-go/internal/application/port/in"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
-	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
-	"github.com/zineb-b/identity-verification-platform-go/internal/application/apperror"
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/validation"
-
+	"github.com/zineb-b/identity-verification-platform-go/internal/domain"
 )
 
 type AuthService struct {
-	userRepo portout.UserRepository
-	hasher portout.PasswordHasher
-	idGenerator portout.IDGenerator
-	clock portout.Clock
+	userRepo     portout.UserRepository
+	hasher       portout.PasswordHasher
+	idGenerator  portout.IDGenerator
+	clock        portout.Clock
 	tokenManager portout.TokenManager
 }
 
-	func NewAuthService(
-		userRepo portout.UserRepository, 
-		hasher portout.PasswordHasher, 
-		idGenerator portout.IDGenerator, 
-		clock portout.Clock,
-		tokenManager portout.TokenManager,
-	) *AuthService {
+func NewAuthService(
+	userRepo portout.UserRepository,
+	hasher portout.PasswordHasher,
+	idGenerator portout.IDGenerator,
+	clock portout.Clock,
+	tokenManager portout.TokenManager,
+) *AuthService {
 	return &AuthService{
-		userRepo: userRepo,
-		hasher: hasher,
-		idGenerator: idGenerator,
-		clock: clock,
+		userRepo:     userRepo,
+		hasher:       hasher,
+		idGenerator:  idGenerator,
+		clock:        clock,
 		tokenManager: tokenManager,
 	}
 }
@@ -41,11 +40,9 @@ type AuthService struct {
 func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*portin.SignupResult, error) {
 	email := strings.TrimSpace(strings.ToLower(cmd.Email))
 
-
 	if cmd.Email == "" {
 		return nil, apperror.ErrEmailRequired
 	}
-
 
 	if !validation.IsValidEmail(email) {
 		return nil, apperror.ErrInvalidEmail
@@ -78,7 +75,6 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 		email,
 		passwordHash,
 		s.clock.Now(),
-
 	)
 	if err != nil {
 		return nil, err
@@ -95,7 +91,7 @@ func (s *AuthService) Signup(ctx context.Context, cmd portin.SignupCommand) (*po
 	}, nil
 }
 
-func (s *AuthService) Login(ctx context.Context, cmd portin.LoginCommand) (*portin.LoginResult, error){
+func (s *AuthService) Login(ctx context.Context, cmd portin.LoginCommand) (*portin.LoginResult, error) {
 	email := strings.TrimSpace(strings.ToLower(cmd.Email))
 
 	if email == "" {
@@ -128,9 +124,9 @@ func (s *AuthService) Login(ctx context.Context, cmd portin.LoginCommand) (*port
 	}
 
 	return &portin.LoginResult{
-		UserID: user.ID,
-		Email:  user.Email,
-		Status: string(user.Status),
+		UserID:      user.ID,
+		Email:       user.Email,
+		Status:      string(user.Status),
 		AccessToken: accessToken,
 	}, nil
 }

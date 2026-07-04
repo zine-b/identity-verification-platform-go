@@ -4,11 +4,11 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"log"
 	"net/http"
-	"time"
 	"strings"
-	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
+	"time"
 )
 
 type contextKey string
@@ -107,8 +107,6 @@ func generateRequestID() string {
 
 	return hex.EncodeToString(bytes)
 }
-
-
 
 func AuthMiddleware(tokenManager portout.TokenManager) Middleware {
 	return func(next http.Handler) http.Handler {

@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"context"
 
-
 	redisclient "github.com/redis/go-redis/v9"
 
 	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
@@ -11,13 +10,11 @@ import (
 	clock "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/time"
 
 	postgres "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/postgres"
+	redisadapter "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/redis"
 	"github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/security"
+	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"github.com/zineb-b/identity-verification-platform-go/internal/application/service"
 	"github.com/zineb-b/identity-verification-platform-go/internal/config"
-	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
-	redisadapter "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/redis"
-
-
 )
 
 // Ce container, cree la cnx avec la base de données, ensuite cree les depandances, à la fin return un object
@@ -26,9 +23,9 @@ import (
 type Container struct {
 	HealthHandler *httpin.HealthHandler
 	AuthHandler   *httpin.AuthHandler
-	TokenManager portout.TokenManager
-	RedisClient *redisclient.Client
-	Close func()
+	TokenManager  portout.TokenManager
+	RedisClient   *redisclient.Client
+	Close         func()
 }
 
 func Build(ctx context.Context, cfg config.Config) (*Container, error) {
@@ -53,7 +50,6 @@ func Build(ctx context.Context, cfg config.Config) (*Container, error) {
 	idGenerator := id.NewUUIDGenerator()
 	systemClock := clock.NewSystemClock()
 	tokenManager := security.NewJWTManager(cfg.JWTSecret)
-	
 
 	authService := service.NewAuthService(userRepository, hasher, idGenerator, systemClock, tokenManager)
 
