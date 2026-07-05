@@ -19,8 +19,9 @@ spec:
 
     spec:
       containers:
-        - name: api
-          image: ghcr.io/zineb-b/identity-api:latest
+        - image: identity-api:local
+          imagePullPolicy: IfNotPresent
+          name: api
 
           ports:
             - containerPort: 8080
