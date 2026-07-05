@@ -20,4 +20,4 @@ spec:
               service:
                 name: identity-api-service
                 port:
-                  number: 80m
+                  number: 80
