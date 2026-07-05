@@ -3,6 +3,7 @@ kind: ConfigMap
 
 metadata:
   name: identity-api-config
+  namespace: identity
 
 data:
   APP_ENV: "production"

@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: identity-api
+  namespace: identity
 
 spec:
   replicas: 3

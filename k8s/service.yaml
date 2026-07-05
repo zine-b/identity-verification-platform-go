@@ -3,6 +3,7 @@ kind: Service
 
 metadata:
   name: identity-api-service
+  namespace: identity
 
 spec:
   type: ClusterIP

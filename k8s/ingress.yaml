@@ -3,6 +3,7 @@ kind: Ingress
 
 metadata:
   name: identity-api-ingress
+  namespace: identity
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 
