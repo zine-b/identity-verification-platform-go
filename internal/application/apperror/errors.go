@@ -15,4 +15,5 @@ var (
 	ErrUserNotFound         = errors.New("user not found")
 	ErrPasswordTooWeak      = errors.New("password must contain uppercase, lowercase and digit")
 	ErrInvalidCredentials   = errors.New("invalid credentials")
+	ErrRefreshTokenNotFound = errors.New("refresh token not found")
 )
