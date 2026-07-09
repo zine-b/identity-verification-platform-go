@@ -7,6 +7,7 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write
   
 jobs:
   test:
@@ -44,17 +45,37 @@ jobs:
           exit-code: 1
           severity: CRITICAL,HIGH
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          workload_identity_provider: projects/734049747710/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-actions@project-27f4ac7e-644c-4f16-b9b.iam.gserviceaccount.com
   
-      - name: Push Docker image
-        run: |
-          docker tag identity-api:test ghcr.io/${{ github.repository_owner }}/identity-api:${{ github.sha }}
-          docker tag identity-api:test ghcr.io/${{ github.repository_owner }}/identity-api:latest
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 
-          docker push ghcr.io/${{ github.repository_owner }}/identity-api:${{ github.sha }}
-          docker push ghcr.io/${{ github.repository_owner }}/identity-api:latest
+      - name: Push Docker image to Artifact Registry
+        run: |
+          IMAGE=europe-west1-docker.pkg.dev/project-27f4ac7e-644c-4f16-b9b/identity-repo/identity-api
+
+          docker tag identity-api:test $IMAGE:${{ github.sha }}
+          docker tag identity-api:test $IMAGE:latest
+
+          docker push $IMAGE:${{ github.sha }}
+          docker push $IMAGE:latest
+      
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: identity-cluster
+          location: europe-west1
+          project_id: project-27f4ac7e-644c-4f16-b9b
+  
+      - name: Update Kubernetes image
+        run: |
+          kubectl set image deployment/identity-api \
+              api=europe-west1-docker.pkg.dev/project-27f4ac7e-644c-4f16-b9b/identity-repo/identity-api:${{ github.sha }} \
+              -n identity
+  
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/identity-api -n identity
