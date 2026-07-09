@@ -19,7 +19,7 @@ spec:
 
     spec:
       containers:
-        - image: identity-api:local
+        - image: europe-west1-docker.pkg.dev/project-27f4ac7e-644c-4f16-b9b/identity-repo/identity-api:latest
           imagePullPolicy: IfNotPresent
           name: api
 
