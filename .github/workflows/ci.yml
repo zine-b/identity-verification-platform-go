@@ -45,6 +45,11 @@ jobs:
           exit-code: 1
           severity: CRITICAL,HIGH
 
+      - name: Debug GitHub context
+        run: |
+          echo "repository=${{ github.repository }}"
+          echo "actor=${{ github.actor }}"
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
