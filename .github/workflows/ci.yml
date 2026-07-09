@@ -76,6 +76,7 @@ jobs:
           location: europe-west1
           project_id: project-27f4ac7e-644c-4f16-b9b
   
+          
       - name: Update Kubernetes image
         run: |
           kubectl set image deployment/identity-api \
