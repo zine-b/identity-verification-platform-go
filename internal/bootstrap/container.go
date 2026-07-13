@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	redisclient "github.com/redis/go-redis/v9"
-
 	loggeradapter "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/logger"
 
 	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
