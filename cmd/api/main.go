@@ -38,6 +38,7 @@ func main() {
 		HealthHandler: container.HealthHandler,
 		AuthHandler:   container.AuthHandler,
 		TokenManager:  container.TokenManager,
+		Logger:        container.Logger,
 	})
 
 	//creer le serveur http

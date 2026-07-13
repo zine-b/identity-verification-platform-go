@@ -4,11 +4,13 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
+
+	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 )
 
 type contextKey string
@@ -18,6 +20,22 @@ const requestIDKey contextKey = "request_id"
 type userClaimsContextKey string
 
 const userClaimsKey userClaimsContextKey = "user_claims"
+
+type statusRecorder struct {
+	http.ResponseWriter
+	status      int
+	wroteHeader bool
+}
+
+func (r *statusRecorder) WriteHeader(status int) {
+	if r.wroteHeader {
+		return
+	}
+
+	r.status = status
+	r.wroteHeader = true
+	r.ResponseWriter.WriteHeader(status)
+}
 
 // fonction qui prend handler HTTP et retourne un nouveau handler HTTP. (router mux)
 // handler d’origine
@@ -41,22 +59,29 @@ func Chain(handler http.Handler, middlewares ...Middleware) http.Handler {
 }
 
 // ajoute du logging autour d’une requête.
-func LoggingMiddleware(next http.Handler) http.Handler {
+func LoggingMiddleware(logger *slog.Logger) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
+			recorder := &statusRecorder{
+				ResponseWriter: w,
+				status:         http.StatusOK,
+			}
 
-		next.ServeHTTP(w, r)
+			next.ServeHTTP(recorder, r)
 
-		// attend juqu'a les autres Middlewares terminent
-		log.Printf(
-			"request_id=%s method=%s path=%s duration=%s",
-			GetRequestID(r.Context()),
-			r.Method,
-			r.URL.Path,
-			time.Since(start),
-		)
-	})
+			logger.Info(
+				"http request completed",
+				"request_id", GetRequestID(r.Context()),
+				"method", r.Method,
+				"path", r.URL.Path,
+				"status", recorder.status,
+				"duration_ms", time.Since(start).Milliseconds(),
+				"remote_addr", r.RemoteAddr,
+			)
+		})
+	}
 }
 
 // protéger ton serveur contre les panic.

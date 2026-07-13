@@ -2,8 +2,11 @@ package bootstrap
 
 import (
 	"context"
+	"log/slog"
 
 	redisclient "github.com/redis/go-redis/v9"
+
+	loggeradapter "github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/logger"
 
 	httpin "github.com/zineb-b/identity-verification-platform-go/internal/adapter/in/http"
 	"github.com/zineb-b/identity-verification-platform-go/internal/adapter/out/id"
@@ -24,6 +27,7 @@ type Container struct {
 	HealthHandler *httpin.HealthHandler
 	AuthHandler   *httpin.AuthHandler
 	TokenManager  portout.TokenManager
+	Logger        *slog.Logger
 	RedisClient   *redisclient.Client
 	Close         func()
 }
@@ -50,6 +54,7 @@ func Build(ctx context.Context, cfg config.Config) (*Container, error) {
 	idGenerator := id.NewUUIDGenerator()
 	systemClock := clock.NewSystemClock()
 	tokenManager := security.NewJWTManager(cfg.JWTSecret)
+	appLogger := loggeradapter.NewJSONLogger(cfg.Env)
 
 	authService := service.NewAuthService(userRepository, hasher, idGenerator, systemClock, tokenManager)
 
@@ -58,6 +63,7 @@ func Build(ctx context.Context, cfg config.Config) (*Container, error) {
 		AuthHandler:   httpin.NewAuthHandler(authService),
 		TokenManager:  tokenManager,
 		RedisClient:   redisClient,
+		Logger:        appLogger,
 		Close: func() {
 			dbPool.Close()
 		},

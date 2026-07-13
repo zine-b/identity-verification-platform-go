@@ -2,6 +2,7 @@ package httpin
 
 import (
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
+	"log/slog"
 	"net/http"
 )
 
@@ -10,6 +11,7 @@ type Handlers struct {
 	HealthHandler *HealthHandler
 	AuthHandler   *AuthHandler
 	TokenManager  portout.TokenManager
+	Logger        *slog.Logger
 }
 
 func NewRouter(handlers Handlers) http.Handler {
@@ -17,7 +19,6 @@ func NewRouter(handlers Handlers) http.Handler {
 
 	healthHandler := handlers.HealthHandler
 	authHandler := handlers.AuthHandler
-
 	meHandler := AuthMiddleware(handlers.TokenManager)(
 		http.HandlerFunc(handlers.AuthHandler.Me),
 	)
@@ -31,6 +32,6 @@ func NewRouter(handlers Handlers) http.Handler {
 		mux,
 		RecoveryMiddleware,
 		RequestIDMiddleware,
-		LoggingMiddleware,
+		LoggingMiddleware(handlers.Logger),
 	)
 }
