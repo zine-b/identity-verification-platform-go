@@ -1,10 +1,10 @@
 package httpin
 
 import (
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	portout "github.com/zineb-b/identity-verification-platform-go/internal/application/port/out"
 	"log/slog"
 	"net/http"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // to avoid cyclic depandancy with container
@@ -30,7 +30,7 @@ func NewRouter(handlers Handlers) http.Handler {
 	mux.HandleFunc("POST /auth/login", authHandler.Login)
 
 	mux.Handle("GET /metrics", promhttp.Handler())
-	
+
 	return Chain(
 		mux,
 		RecoveryMiddleware,
