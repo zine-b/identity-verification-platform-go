@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: logstash-config
+  namespace: identity
+
+data:
+  logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
+
+    filter {
+      json {
+        source => "message"
+      }
+
+      mutate {
+        add_field => {
+          "application" => "identity-api"
+          "environment" => "production"
+        }
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["http://elasticsearch:9200"]
+        index => "identity-api-%{+YYYY.MM.dd}"
+      }
+
+      stdout {
+        codec => rubydebug
+      }
+    }
